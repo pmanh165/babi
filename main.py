@@ -2,8 +2,10 @@ from fastapi import FastAPI, Request, BackgroundTasks
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import FileResponse
 import requests
 import os
+import glob
 
 # Auto-create static directories to prevent Render failures
 os.makedirs("static/images", exist_ok=True)
@@ -26,6 +28,14 @@ def trigger_webhook(user_agent: str):
         requests.post(url, json=payload, timeout=5)
     except Exception as e:
         print(f"Webhook Error: {e}")
+
+@app.get("/music.mp3")
+async def get_music():
+    """Serve any mp3 file present in root or static directory dynamically"""
+    mp3_files = glob.glob("*.mp3") + glob.glob("static/*.mp3")
+    if mp3_files:
+        return FileResponse(mp3_files[0])
+    return {"error": "Music file not found"}
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_reward(request: Request, background_tasks: BackgroundTasks):

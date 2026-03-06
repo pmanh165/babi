@@ -1,0 +1,14 @@
+# Environments
+.venv/
+__pycache__/
+
+# Mac specifics
+.DS_Store
+
+# User generated files
+static/images/*
+static/music.mp3
+!static/images/.gitkeep
+
+# Env overrides
+.env

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Gift</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #1e293b 0%, var(--bg-color) 100%);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .gift-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 360px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            animation: float 5s ease-in-out infinite;
+            z-index: 10;
+            transition: transform 0.1s ease-out;
+            transform-style: preserve-3d;
+        }
+
+        .gift-image-container {
+            width: 100%;
+            height: 280px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gift-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .gift-image-placeholder {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            font-style: italic;
+            position: absolute;
+        }
+
+        .gift-card:hover .gift-image {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            background: linear-gradient(135deg, #c084fc 0%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transform: translateZ(30px);
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #cbd5e1;
+            margin: 0 0 32px 0;
+            transform: translateZ(20px);
+        }
+
+        .play-btn {
+            background: linear-gradient(135deg, #c084fc 0%, #38bdf8 100%);
+            border: none;
+            padding: 16px 36px;
+            border-radius: 9999px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(192, 132, 252, 0.4);
+            transform: translateZ(40px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .play-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(rgba(255, 255, 255, 0.2), transparent);
+            border-radius: 9999px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .play-btn:hover {
+            transform: translateZ(40px) scale(1.05);
+            box-shadow: 0 15px 25px -5px rgba(192, 132, 252, 0.6);
+        }
+
+        .play-btn:hover::after {
+            opacity: 1;
+        }
+
+        .play-btn:active {
+            transform: translateZ(40px) scale(0.95);
+        }
+
+        /* Ambient Orbs Background */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            z-index: 0;
+            animation: moveOrb 20s infinite alternate;
+        }
+
+        .orb-1 {
+            background: #c084fc;
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            left: -100px;
+        }
+
+        .orb-2 {
+            background: #38bdf8;
+            width: 400px;
+            height: 400px;
+            bottom: -200px;
+            right: -100px;
+            animation-delay: -10s;
+        }
+
+        @keyframes moveOrb {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="gift-card" id="card">
+        <div class="gift-image-container">
+            <span class="gift-image-placeholder">[Hình ảnh hiển thị ở đây]</span>
+            {% if images %}
+            <img src="{{ url_for('static', path=images[0]) }}" alt="A Special Gift" class="gift-image"
+                onerror="this.style.display='none'">
+            {% endif %}
+        </div>
+
+        <h1>For You ✨</h1>
+        <p>{{ message }}</p>
+
+        <button class="play-btn" id="playMusic">Mở Quà 🎵</button>
+    </div>
+
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="{{ url_for('static', path='music.mp3') }}" type="audio/mpeg">
+    </audio>
+
+    <script>
+        document.getElementById('playMusic').addEventListener('click', function () {
+            const audio = document.getElementById('bgMusic');
+            if (audio.paused) {
+                audio.play().catch(e => console.log('Audio play failed:', e));
+                this.innerHTML = 'Đang phát 🎵';
+                this.style.background = 'linear-gradient(135deg, #38bdf8 0%, #c084fc 100%)';
+            } else {
+                audio.pause();
+                this.innerHTML = 'Tiếp tục 🎵';
+                this.style.background = 'linear-gradient(135deg, #c084fc 0%, #38bdf8 100%)';
+            }
+        });
+
+        // 3D Tilt Effect
+        const card = document.getElementById('card');
+
+        document.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 30;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 30;
+            // apply slight 3D rotation based on mouse position
+            card.style.transform = `rotateY(${-xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+
+        document.addEventListener('mouseleave', () => {
+            card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+            card.style.transition = 'transform 0.5s ease';
+        });
+
+        document.addEventListener('mouseenter', () => {
+            card.style.transition = 'none';
+        });
+    </script>
+</body>
+
+</html>

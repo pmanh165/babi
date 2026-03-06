@@ -5,6 +5,9 @@ from fastapi.templating import Jinja2Templates
 import requests
 import os
 
+# Auto-create static directories to prevent Render failures
+os.makedirs("static/images", exist_ok=True)
+
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")

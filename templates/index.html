@@ -10,10 +10,6 @@
 
         :root {
             --bg-pink: #ffe6eb;
-            --env-color: #ffb3c6;
-            --env-pocket: #ff8fab;
-            --env-flap: #fb6f92;
-            --letter-bg: #fff0f3;
             --text-color: #590d22;
         }
 
@@ -25,8 +21,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            /* Background sử dụng ảnh của User, fallback gradient hồng */
-            background: center/cover no-repeat url("{{ url_for('static', path='images/background.jpg') }}"),
+            background: url("{{ url_for('static', path='images/background.jpg') }}") center/cover no-repeat,
             linear-gradient(135deg, var(--bg-pink) 0%, #ffc2d1 100%);
             color: var(--text-color);
             font-family: 'Inter', sans-serif;
@@ -35,34 +30,34 @@
         }
 
         /* Decorative Side Images */
-        .decor-left,
-        .decor-right {
+        .decor {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 200px;
-            opacity: 0.8;
+            height: 90vh;
+            max-width: 280px;
+            object-fit: contain;
             pointer-events: none;
             z-index: 0;
+            opacity: 0.85;
         }
 
         .decor-left {
-            left: 5%;
+            left: 2%;
         }
 
         .decor-right {
-            right: 5%;
+            right: 2%;
             transform: translateY(-50%) scaleX(-1);
         }
 
-        /* Envelope Container */
+        /* The Envelope System */
         .envelope-wrapper {
             position: relative;
-            width: 320px;
+            width: 340px;
             height: 220px;
-            margin-top: 50px;
             z-index: 10;
-            transition: transform 0.3s ease;
+            margin-top: 40px;
         }
 
         .envelope-wrapper.float {
@@ -83,58 +78,149 @@
             }
         }
 
-        /* Envelope Back */
-        .envelope {
-            position: relative;
+        /* Layers */
+        .env-back {
+            position: absolute;
             width: 100%;
             height: 100%;
-            background: var(--env-color);
+            background: #ffb3c6;
             border-radius: 8px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-            /* Phủ ảnh envelope.jpg (nếu có) lên làm texture */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
             background-image: url("{{ url_for('static', path='images/envelope.jpg') }}");
             background-size: cover;
-            background-position: center;
             background-blend-mode: multiply;
-            /* Hòa trộn ảnh mờ với màu hồng */
+            z-index: 0;
         }
 
-        /* The Letter inside */
         .letter {
             position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 5px;
+            left: 5%;
             width: 90%;
-            height: 90%;
-            background: var(--letter-bg);
+            height: 95%;
+            background: #fff0f3;
             border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.8s ease;
-            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 24px;
             box-sizing: border-box;
             text-align: center;
-            z-index: 2;
             overflow-y: auto;
-            /* hidden scrollbar */
             scrollbar-width: none;
+
+            /* Z-index & transform */
+            z-index: 2;
+            transform: translateY(0);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .letter::-webkit-scrollbar {
             display: none;
         }
 
-        .letter.open {
-            bottom: 110px;
-            /* pull letter up */
+        .envelope-wrapper.open .letter {
+            transform: translateY(-170px);
+            transition: transform 0.6s 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             height: 380px;
-            width: 110%;
-            /* make it larger so they can read */
+        }
+
+        .flap {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-image: url("{{ url_for('static', path='images/envelope.jpg') }}");
+            background-size: cover;
+            background-blend-mode: multiply;
+        }
+
+        .flap-left {
+            background-color: #ff99b3;
+            clip-path: polygon(0 0, 50% 50%, 0 100%);
+            z-index: 3;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .flap-right {
+            background-color: #ff99b3;
+            clip-path: polygon(100% 0, 50% 50%, 100% 100%);
+            z-index: 4;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .flap-bottom {
+            background-color: #ff85a3;
+            clip-path: polygon(0 100%, 50% 45%, 100% 100%);
+            z-index: 5;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .flap-top {
+            background-color: #ff7096;
+            clip-path: polygon(0 0, 50% 55%, 100% 0);
+            transform-origin: top;
+            border-radius: 8px 8px 0 0;
+
+            /* Magic Z-index flipping */
+            z-index: 6;
+            transition: transform 0.5s 0.6s, z-index 0s 0.6s;
+        }
+
+        .envelope-wrapper.open .flap-top {
+            transform: rotateX(180deg);
+            z-index: 1;
+            transition: transform 0.5s, z-index 0s 0.25s;
+        }
+
+        .seal {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 55px;
+            height: 55px;
+            background: #a4133c;
+            border-radius: 50%;
+            z-index: 7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.3s 0.6s;
+            cursor: pointer;
+        }
+
+        .envelope-wrapper.open .seal {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s 0s;
+        }
+
+        .action-btn {
+            margin-top: 80px;
+            background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%);
+            border: none;
+            padding: 14px 40px;
+            border-radius: 30px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(201, 24, 74, 0.3);
+            transition: all 0.2s;
+            z-index: 20;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #c9184a 0%, #ff4d6d 100%);
         }
 
         h1 {
             font-family: 'Dancing Script', cursive;
-            font-size: 36px;
+            font-size: 34px;
             color: #c9184a;
             margin: 0 0 15px 0;
         }
@@ -142,223 +228,86 @@
         p {
             font-size: 15px;
             line-height: 1.6;
-            margin-bottom: 20px;
-            white-space: pre-wrap;
+            margin-bottom: 10px;
+            color: #590d22;
         }
 
-        .gift-image {
-            width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        /* Envelope Front Pocket */
-        .pocket {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 0 160px 120px 160px;
-            border-color: transparent transparent var(--env-pocket) transparent;
-            z-index: 3;
-            border-radius: 0 0 8px 8px;
-        }
-
-        /* Envelope Left & Right Flaps */
-        .left-flap {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 110px 0 110px 160px;
-            border-color: transparent transparent transparent rgba(255, 143, 171, 0.9);
-            z-index: 4;
-            border-radius: 0 0 0 8px;
-        }
-
-        .right-flap {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 110px 160px 110px 0;
-            border-color: transparent rgba(255, 143, 171, 0.8) transparent transparent;
-            z-index: 4;
-            border-radius: 0 0 8px 0;
-        }
-
-        /* Envelope Top Flap */
-        .top-flap {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 120px 160px 0 160px;
-            border-color: var(--env-flap) transparent transparent transparent;
-            transform-origin: top;
-            transition: transform 0.6s ease;
-            z-index: 5;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .top-flap.open {
-            transform: rotateX(180deg);
-            z-index: 1;
-            /* move behind the letter */
-        }
-
-        .action-btn {
-            margin-top: 80px;
-            background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%);
-            border: none;
-            padding: 16px 45px;
-            border-radius: 30px;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(201, 24, 74, 0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
-            z-index: 20;
-            position: relative;
-        }
-
-        .action-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 12px 25px rgba(201, 24, 74, 0.4);
-        }
-
-        .action-btn:active {
-            transform: scale(0.95);
-        }
-
-        .seal {
-            position: absolute;
-            top: 110px;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            background: #a4133c;
-            border-radius: 50%;
-            z-index: 6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: opacity 0.3s ease;
-        }
-
-        .seal.open {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
-
-            .decor-left,
-            .decor-right {
+            .decor {
                 opacity: 0.3;
+                height: 50vh;
             }
 
-            /* Mờ dần trên màn nhỏ */
+            .envelope-wrapper {
+                transform: scale(0.9);
+            }
         }
     </style>
 </head>
 
 <body>
-    <!-- Side decors -->
-    <img src="{{ url_for('static', path='images/side_decor.jpg') }}" alt="" class="decor-left"
+    <img src="{{ url_for('static', path='images/side_decor.jpg') }}" class="decor decor-left"
         onerror="this.style.display='none'">
-    <img src="{{ url_for('static', path='images/side_decor.jpg') }}" alt="" class="decor-right"
+    <img src="{{ url_for('static', path='images/side_decor.jpg') }}" class="decor decor-right"
         onerror="this.style.display='none'">
 
-    <div class="envelope-wrapper float" id="envelopeWrapper">
-        <div class="envelope">
-            <div class="top-flap" id="topFlap"></div>
-            <div class="left-flap"></div>
-            <div class="right-flap"></div>
-            <div class="pocket"></div>
+    <div class="envelope-wrapper float" id="envContainer">
+        <div class="env-back"></div>
 
-            <div class="seal" id="seal">💌</div>
-
-            <div class="letter" id="letter">
-                <h1>For You ✨</h1>
-                {% if images %}
-                <img src="{{ url_for('static', path=images[0]) }}" alt="A Special Gift" class="gift-image"
-                    onerror="this.style.display='none'">
-                {% endif %}
-                <p>{{ message }}</p>
-            </div>
+        <!-- The Sliding Letter -->
+        <div class="letter">
+            <h1>For You ✨</h1>
+            {% if images %}
+            <img src="{{ url_for('static', path=images[0]) }}" alt="Gift"
+                style="width:100%; border-radius:8px; margin-bottom:15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"
+                onerror="this.style.display='none'">
+            {% endif %}
+            <p>{{ message }}</p>
         </div>
+
+        <div class="flap flap-left"></div>
+        <div class="flap flap-right"></div>
+        <div class="flap flap-bottom"></div>
+        <div class="flap flap-top"></div>
+
+        <div class="seal" id="sealBtn">💌</div>
     </div>
 
-    <button class="action-btn" id="openBtn">Mở Thư Ngay 🥺</button>
+    <button class="action-btn" id="toggleBtn">Mở Thư Ngay 🌸</button>
 
-    <!-- Background Music -->
-    <audio id="bgMusic" loop>
+    <audio id="bgMusic" loop autoplay>
         <source src="{{ url_for('static', path='music.mp3') }}" type="audio/mpeg">
     </audio>
 
     <script>
-        const openBtn = document.getElementById('openBtn');
-        const topFlap = document.getElementById('topFlap');
-        const letter = document.getElementById('letter');
-        const seal = document.getElementById('seal');
-        const bgMusic = document.getElementById('bgMusic');
-        const wrapper = document.getElementById('envelopeWrapper');
+        const btn = document.getElementById('toggleBtn');
+        const sealBtn = document.getElementById('sealBtn');
+        const env = document.getElementById('envContainer');
+        const music = document.getElementById('bgMusic');
         let isOpen = false;
 
-        openBtn.addEventListener('click', function () {
+        // Force play on first click anywhere (bypasses browser autoplay restrictions)
+        document.body.addEventListener('click', () => {
+            if (music.paused) music.play().catch(e => console.log('Autoplay restriction:', e));
+        }, { once: true });
+
+        function toggleEnvelope() {
             if (!isOpen) {
-                // Mở thư & mở nhạc
-                bgMusic.play().catch(e => console.log('Audio play failed:', e));
-
-                // Dừng animation lơ lửng để dễ đọc
-                wrapper.classList.remove('float');
-
-                // Mở nắp phong bì
-                seal.classList.add('open');
-                topFlap.classList.add('open');
-
-                // Chờ nắp mở xong thì kéo thư lên
-                setTimeout(() => {
-                    letter.classList.add('open');
-                    letter.style.zIndex = '10'; // Nổi lên trên các nếp gấp phong bì
-                }, 400);
-
-                openBtn.innerHTML = 'Đóng Phong Bì 🌸';
+                music.play().catch(e => { });
+                env.classList.remove('float');
+                env.classList.add('open');
+                btn.innerHTML = 'Đóng Phong Bì 🥺';
                 isOpen = true;
             } else {
-                // Đóng thư lại
-                letter.classList.remove('open');
-
-                // Chờ thư tụt xuống thì đóng nắp
-                setTimeout(() => {
-                    letter.style.zIndex = '2'; // Trả về dưới mặt phong bì
-                    topFlap.classList.remove('open');
-                    seal.classList.remove('open');
-                    wrapper.classList.add('float'); // Tiếp tục bay lơ lửng
-                }, 600);
-
-                bgMusic.pause();
-                openBtn.innerHTML = 'Tiếp Tục Đọc 🥺';
+                env.classList.remove('open');
+                env.classList.add('float');
+                btn.innerHTML = 'Tiếp Tục Đọc 🌸';
                 isOpen = false;
             }
-        });
+        }
+
+        btn.addEventListener('click', toggleEnvelope);
+        sealBtn.addEventListener('click', toggleEnvelope);
     </script>
 </body>
 

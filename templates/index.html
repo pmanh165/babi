@@ -21,8 +21,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: url("{{ url_for('static', path='images/background.jpg') }}") center/cover no-repeat,
-            linear-gradient(135deg, var(--bg-pink) 0%, #ffc2d1 100%);
+            background: url("/static/images/background.jpg") center/cover no-repeat,
+                linear-gradient(135deg, var(--bg-pink) 0%, #ffc2d1 100%);
             color: var(--text-color);
             font-family: 'Inter', sans-serif;
             overflow: hidden;
@@ -86,7 +86,7 @@
             background: #ffb3c6;
             border-radius: 8px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-            background-image: url("{{ url_for('static', path='images/envelope.jpg') }}");
+            background-image: url("/static/images/envelope.jpg");
             background-size: cover;
             background-blend-mode: multiply;
             z-index: 0;
@@ -130,7 +130,7 @@
             height: 100%;
             top: 0;
             left: 0;
-            background-image: url("{{ url_for('static', path='images/envelope.jpg') }}");
+            background-image: url("/static/images/envelope.jpg");
             background-size: cover;
             background-blend-mode: multiply;
         }
@@ -249,10 +249,8 @@
 </head>
 
 <body>
-    <img src="{{ url_for('static', path='images/side_decor.jpg') }}" class="decor decor-left"
-        onerror="this.style.display='none'">
-    <img src="{{ url_for('static', path='images/side_decor.jpg') }}" class="decor decor-right"
-        onerror="this.style.display='none'">
+    <img src="/static/images/side_decor.jpg" alt="decor" class="decor decor-left" onerror="this.style.display='none'">
+    <img src="/static/images/side_decor.jpg" alt="decor" class="decor decor-right" onerror="this.style.display='none'">
 
     <div class="envelope-wrapper float" id="envContainer">
         <div class="env-back"></div>
@@ -261,7 +259,7 @@
         <div class="letter">
             <h1>For You ✨</h1>
             {% if images %}
-            <img src="{{ url_for('static', path=images[0]) }}" alt="Gift"
+            <img src="/static/{{ images[0] }}" alt="Gift"
                 style="width:100%; border-radius:8px; margin-bottom:15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"
                 onerror="this.style.display='none'">
             {% endif %}

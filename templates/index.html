@@ -344,11 +344,13 @@
 
         // Force play on first click anywhere
         document.body.addEventListener('click', () => {
+            music.currentTime = 35;
             if (music.paused) music.play().catch(e => console.log('Autoplay restriction:', e));
         }, { once: true });
 
         function toggleEnvelope() {
             if (!isOpen) {
+                music.currentTime = 35;
                 music.play().catch(e => { });
                 env.classList.remove('float');
                 env.classList.add('open');

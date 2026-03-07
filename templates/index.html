@@ -415,7 +415,7 @@
         /* ── Lazy loader: only load media within ±2 of current slide ── */
         function loadNearby(n) {
             const slideEls = Array.from(track.children);
-            for (let i = Math.max(0, n - 2); i <= Math.min(slideEls.length - 1, n + 2); i++) {
+            for (let i = Math.max(0, n - 3); i <= Math.min(slideEls.length - 1, n + 3); i++) {
                 const img = slideEls[i].querySelector('img[data-src]');
                 if (img) { img.src = img.dataset.src; img.removeAttribute('data-src'); }
                 const vid = slideEls[i].querySelector('video[data-src]');

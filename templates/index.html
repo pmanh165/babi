@@ -93,6 +93,11 @@
             transform: translate(-50%, -54%) scale(1);
         }
 
+        body.env-open .card.focus-letter {
+            transform: translate(-50%, -54%) scale(1.04);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, .4);
+        }
+
         /* ─── Slide track ─── */
         .slide-track {
             display: flex;
@@ -561,6 +566,9 @@
                 d.classList.toggle('active', i === current));
             navPrev.classList.toggle('hidden', current === 0);
             navNext.classList.toggle('hidden', current === totalSlides - 1);
+
+            // Zoom effect on letter slide
+            card.classList.toggle('focus-letter', current === totalSlides - 1);
         }
 
         navPrev.addEventListener('click', () => goTo(current - 1));

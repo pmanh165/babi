@@ -3,15 +3,15 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse
-import requests
 import os
 import glob
 
 # Vercel functions are read-only, so we cannot create directories here at runtime.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8543900765:AAFRHplaqbv0fvaBXHNSeo4EWscyceIt4q0")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "7841326585")
@@ -31,7 +31,7 @@ def trigger_webhook(user_agent: str):
 @app.get("/music.mp3")
 async def get_music():
     """Serve any mp3 file present in root or static directory dynamically"""
-    mp3_files = glob.glob("*.mp3") + glob.glob("static/*.mp3")
+    mp3_files = glob.glob(os.path.join(BASE_DIR, "*.mp3")) + glob.glob(os.path.join(BASE_DIR, "static", "*.mp3"))
     if mp3_files:
         return FileResponse(mp3_files[0])
     return {"error": "Music file not found"}

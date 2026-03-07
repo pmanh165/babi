@@ -167,8 +167,12 @@
             letter-spacing: .4px;
         }
 
-        /* ─── Letter slide (last slide) ─── */
+        /* ─── Letter screen (Overlay) ─── */
         .slide-letter {
+            position: absolute;
+            inset: 0;
+            z-index: 100;
+            display: flex;
             flex-direction: column;
             align-items: stretch;
             padding: 0;
@@ -176,6 +180,36 @@
             scrollbar-width: none;
             background: #fffbf2;
             text-align: left;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+            transition: opacity 0.4s, transform 0.4s;
+        }
+
+        .slide-letter.show {
+            opacity: 1;
+            pointer-events: all;
+            transform: scale(1);
+        }
+
+        .close-letter-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: rgba(201, 24, 74, 0.1);
+            color: var(--deep);
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.2s;
+        }
+
+        .close-letter-btn:hover {
+            background: rgba(201, 24, 74, 0.2);
         }
 
         .slide-letter::-webkit-scrollbar {
@@ -244,10 +278,34 @@
             letter-spacing: 6px;
         }
 
-        .slide-letter p {
-            font-size: 14px;
-            line-height: 1.65;
-            color: #590d22;
+        .read-letter-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--deep), var(--pink));
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(201, 24, 74, .4);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s, box-shadow 0.2s;
+            z-index: 20;
+        }
+
+        .read-letter-btn.show {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .read-letter-btn:hover {
+            box-shadow: 0 6px 20px rgba(201, 24, 74, .6);
         }
 
         /* ─── Nav arrows ─── */
@@ -502,24 +560,6 @@
                 </div>
                 {% endfor %}
 
-                <!-- Final slide: the letter -->
-                <div class="slide slide-letter" id="letterSlide">
-                    <div class="letter-inner">
-                        <div class="letter-stamp"><span>💌🌹</span></div>
-                        <div class="letter-greeting">Gửi người anh thương,</div>
-                        <div class="letter-body">Bé yêu của anh ơi,
-                            Hôm nay không chỉ là ngày 8/3 để anh tôn vinh người phụ nữ của anh, mà còn là dấu mốc 1 năm
-                            mình bên nhau. Cuốn album này anh chuẩn bị, là để mình cùng nhìn lại từng nụ cười, từng
-                            khoảnh khắc mình đã cùng xây dựng suốt một năm qua mình đã đi cùng nhau.
-
-                            Cảm ơn em vì đã chọn ở lại bên anh, tin tưởng anh. Anh sẽ luôn ở đây, nâng niu và bảo vệ em
-                            như cách anh đã làm suốt 1 năm qua.
-
-                            Chúc mừng kỷ niệm 1 năm bên nhau và chúc mừng ngày của em!</div>
-                        <div class="letter-sign">Của em mãi mãi 🌹</div>
-                        <div class="letter-rose">🌹 🌸 🌹</div>
-                    </div>
-                </div>
             </div> <!-- end slide-track -->
 
             <!-- Nav -->
@@ -531,6 +571,29 @@
 
             <!-- Swipe hint -->
             <div class="swipe-hint" id="swipeHint">👉 Lướt phải để xem chuyện đôi mình</div>
+
+            <!-- Read Letter Button -->
+            <button class="read-letter-btn" id="readLetterBtn">Đọc Thư 💌</button>
+
+            <!-- Final slide: the letter (Overlay) -->
+            <div class="slide slide-letter" id="letterSlide">
+                <button class="close-letter-btn" id="closeLetterBtn">✕</button>
+                <div class="letter-inner">
+                    <div class="letter-stamp"><span>💌🌹</span></div>
+                    <div class="letter-greeting">Gửi người anh thương,</div>
+                    <div class="letter-body">Bé yêu của anh ơi,
+                        Hôm nay không chỉ là ngày 8/3 để anh tôn vinh người phụ nữ của anh, mà còn là dấu mốc 1 năm mình
+                        bên nhau. Cuốn album này anh chuẩn bị, là để mình cùng nhìn lại từng nụ cười, từng khoảnh khắc
+                        mình đã cùng xây dựng suốt một năm qua.
+
+                        Cảm ơn em vì đã chọn ở lại bên anh, tin tưởng anh. Anh sẽ luôn ở đây, nâng niu và bảo vệ em như
+                        cách anh đã làm suốt 1 năm qua.
+
+                        Chúc mừng kỷ niệm 1 năm bên nhau và chúc mừng ngày của em!</div>
+                    <div class="letter-sign">Của em mãi mãi 🌹</div>
+                    <div class="letter-rose">🌹 🌸 🌹</div>
+                </div>
+            </div>
         </div> <!-- end card -->
 
         <div class="flap flap-left"></div>
@@ -555,10 +618,17 @@
         const navNext = document.getElementById('navNext');
         const dotsEl = document.getElementById('dots');
         const music = document.getElementById('bgMusic');
+        const readLetterBtn = document.getElementById('readLetterBtn');
+        const closeLetterBtn = document.getElementById('closeLetterBtn');
+        const letterSlide = document.getElementById('letterSlide');
+        const cardControlBox = document.getElementById('card'); // using 'card' variable declared below, declaring early
+        const c_card = document.getElementById('card');
 
+        // Note: The letter slide is now an overlay, so totalSlides only counts the media slides
         const totalSlides = track.children.length;
         let current = 0;
         let isOpen = false;
+        let isLetterOpen = false;
 
         /* ── Build dots ── */
         for (let i = 0; i < totalSlides; i++) {
@@ -594,22 +664,42 @@
 
             dotsEl.querySelectorAll('.dot').forEach((d, i) =>
                 d.classList.toggle('active', i === current));
-            navPrev.classList.toggle('hidden', current === 0);
-            navNext.classList.toggle('hidden', current === totalSlides - 1);
 
-            // Zoom effect on letter slide
-            card.classList.toggle('focus-letter', current === totalSlides - 1);
+            navPrev.classList.toggle('hidden', current === 0 || isLetterOpen);
+            navNext.classList.toggle('hidden', current === totalSlides - 1 || isLetterOpen);
+
+            // Show "Read Letter" button only on the last slide
+            readLetterBtn.classList.toggle('show', current === totalSlides - 1 && !isLetterOpen);
         }
 
         navPrev.addEventListener('click', () => goTo(current - 1));
         navNext.addEventListener('click', () => goTo(current + 1));
 
+        /* ── Letter Overlay Controls ── */
+        readLetterBtn.addEventListener('click', () => {
+            isLetterOpen = true;
+            letterSlide.classList.add('show');
+            c_card.classList.add('focus-letter');
+            readLetterBtn.classList.remove('show');
+            navPrev.classList.add('hidden');
+            navNext.classList.add('hidden');
+            dotsEl.style.display = 'none';
+        });
+
+        closeLetterBtn.addEventListener('click', () => {
+            isLetterOpen = false;
+            letterSlide.classList.remove('show');
+            c_card.classList.remove('focus-letter');
+            readLetterBtn.classList.add('show');
+            dotsEl.style.display = 'flex';
+            goTo(current); // Re-evaluate arrows and buttons visibility
+        });
+
         /* ── Touch/swipe ── */
         let touchX = null;
-        const card = document.getElementById('card');
-        card.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
-        card.addEventListener('touchend', e => {
-            if (touchX === null) return;
+        c_card.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+        c_card.addEventListener('touchend', e => {
+            if (touchX === null || isLetterOpen) return;
             const dx = e.changedTouches[0].clientX - touchX;
             if (Math.abs(dx) > 40) {
                 goTo(current + (dx < 0 ? 1 : -1));

@@ -51,13 +51,13 @@
             transform: translateY(-50%) scaleX(-1);
         }
 
-        /* The Envelope System */
         .envelope-wrapper {
             position: relative;
             width: 340px;
             height: 220px;
             z-index: 10;
-            margin-top: 40px;
+            margin-top: 10vh;
+            /* Push envelope down on short screens */
         }
 
         .envelope-wrapper.float {
@@ -118,9 +118,10 @@
         }
 
         .envelope-wrapper.open .letter {
-            transform: translateY(-40px);
+            transform: translateY(-20px);
             transition: transform 0.6s 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.6s 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            height: 320px;
+            height: 260px;
+            /* Reduced to avoid top cropping */
         }
 
         .flap {
@@ -199,7 +200,9 @@
         }
 
         .action-btn {
-            margin-top: 80px;
+            margin-top: 30px;
+            /* Reduced from 80px */
+            margin-bottom: 5vh;
             background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%);
             border: none;
             padding: 14px 40px;

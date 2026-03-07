@@ -22,6 +22,7 @@
             padding: 0;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             background: url("/static/images/background.jpg") center/cover no-repeat,
@@ -32,97 +33,12 @@
             perspective: 1000px;
         }
 
-        /* ── Page layout ── */
-        .page-layout {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* ── Photobooth panels ── */
-        .photobooth {
-            width: 140px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(201, 24, 74, 0.2);
-            padding: 8px 8px 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-            opacity: 0;
-            transform: scale(0.85) translateY(20px);
-            transition: opacity 0.5s 0.7s ease, transform 0.5s 0.7s ease;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .page-layout.open .photobooth {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-            pointer-events: auto;
-            animation: photoFloat 5s ease-in-out infinite;
-        }
-
-        #photoLeft {
-            animation-delay: 0s;
-        }
-
-        #photoRight {
-            animation-delay: 2.5s;
-        }
-
-        @keyframes photoFloat {
-            0% {
-                transform: scale(1) translateY(0px) rotate(0.5deg);
-            }
-
-            50% {
-                transform: scale(1) translateY(-10px) rotate(-0.5deg);
-            }
-
-            100% {
-                transform: scale(1) translateY(0px) rotate(0.5deg);
-            }
-        }
-
-        /* The actual image, shown as bg to allow half-crop */
-        .strip-container {
-            width: 100%;
-            overflow: hidden;
-            border-radius: 4px;
-            line-height: 0;
-        }
-
-        .strip-container img {
-            width: 200%;
-            height: auto;
-            display: block;
-        }
-
-        .strip-half-left img {
-            margin-left: 0%;
-        }
-
-        .strip-half-right img {
-            margin-left: -100%;
-        }
-
-
-        /* ── Centre column ── */
-        .center-col {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
         /* ── Envelope ── */
         .envelope-wrapper {
             position: relative;
             width: 340px;
             height: 220px;
             z-index: 10;
-            flex-shrink: 0;
         }
 
         .envelope-wrapper.float {
@@ -143,7 +59,6 @@
             }
         }
 
-        /* Layers */
         .env-back {
             position: absolute;
             width: 100%;
@@ -258,9 +173,9 @@
             transition: opacity 0.2s 0s;
         }
 
-        /* ── Action button ── */
+        /* ── Button ── */
         .action-btn {
-            margin-top: 28px;
+            margin-top: 32px;
             background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%);
             border: none;
             padding: 14px 40px;
@@ -272,7 +187,6 @@
             box-shadow: 0 10px 20px rgba(201, 24, 74, 0.3);
             transition: all 0.2s;
             z-index: 20;
-            white-space: nowrap;
         }
 
         .action-btn:hover {
@@ -294,46 +208,20 @@
             color: #590d22;
         }
 
+        /* ── Particle burst ── */
+        .particle {
+            position: fixed;
+            border-radius: 50%;
+            background-image: url('/static/images/side_decor.jpg');
+            background-size: 200% 500%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            border: 3px solid #fff;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0;
+        }
+
         @media (max-width: 768px) {
-
-            /* Stack everything vertically on mobile */
-            .page-layout {
-                flex-direction: column;
-                gap: 12px;
-                padding: 20px 0;
-            }
-
-            /* Wrap both photobooths in a row below the envelope */
-            #photoLeft,
-            #photoRight {
-                order: 2;
-                /* push below center-col */
-                width: 38vw;
-                max-width: 160px;
-                min-width: 110px;
-            }
-
-            .center-col {
-                order: 1;
-            }
-
-            /* Lay the two panels in a row by making page-layout a row again
-               but wrapping the photo panels into a flex row */
-            .page-layout {
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .center-col {
-                width: 100%;
-                order: 1;
-            }
-
-            .photobooth {
-                order: 2;
-            }
-
             .envelope-wrapper {
                 transform: scale(0.9);
             }
@@ -342,50 +230,28 @@
 </head>
 
 <body>
-    <!-- ── Page Layout: photobooth | envelope | photobooth ── -->
-    <div class="page-layout" id="pageLayout">
+    <div class="envelope-wrapper float" id="envContainer">
+        <div class="env-back"></div>
 
-        <!-- Left photobooth: left half of side_decor.jpg -->
-        <div class="photobooth" id="photoLeft">
-            <div class="strip-container strip-half-left">
-                <img src="/static/images/side_decor.jpg" alt="photobooth left">
-            </div>
+        <div class="letter">
+            <h1>For You ✨</h1>
+            {% if images %}
+            <img src="/static/{{ images[0] }}" alt="Gift"
+                style="width:100%; border-radius:8px; margin-bottom:15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"
+                onerror="this.style.display='none'">
+            {% endif %}
+            <p>{{ message }}</p>
         </div>
 
-        <!-- Centre: envelope + button stacked -->
-        <div class="center-col">
-            <div class="envelope-wrapper float" id="envContainer">
-                <div class="env-back"></div>
+        <div class="flap flap-left"></div>
+        <div class="flap flap-right"></div>
+        <div class="flap flap-bottom"></div>
+        <div class="flap flap-top"></div>
 
-                <!-- The Sliding Letter -->
-                <div class="letter">
-                    <h1>For You ✨</h1>
-                    {% if images %}
-                    <img src="/static/{{ images[0] }}" alt="Gift"
-                        style="width:100%; border-radius:8px; margin-bottom:15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"
-                        onerror="this.style.display='none'">
-                    {% endif %}
-                    <p>{{ message }}</p>
-                </div>
-
-                <div class="flap flap-left"></div>
-                <div class="flap flap-right"></div>
-                <div class="flap flap-bottom"></div>
-                <div class="flap flap-top"></div>
-
-                <div class="seal" id="sealBtn">💌</div>
-            </div>
-
-            <button class="action-btn" id="toggleBtn">Mở Thư Ngay 🌸</button>
-        </div>
-
-        <!-- Right photobooth: right half of side_decor.jpg -->
-        <div class="photobooth" id="photoRight">
-            <div class="strip-container strip-half-right">
-                <img src="/static/images/side_decor.jpg" alt="photobooth right">
-            </div>
-        </div>
+        <div class="seal" id="sealBtn">💌</div>
     </div>
+
+    <button class="action-btn" id="toggleBtn">Mở Thư Ngay 🌸</button>
 
     <audio id="bgMusic" loop autoplay>
         <source src="/music.mp3" type="audio/mpeg">
@@ -395,31 +261,95 @@
         const btn = document.getElementById('toggleBtn');
         const sealBtn = document.getElementById('sealBtn');
         const env = document.getElementById('envContainer');
-        const layout = document.getElementById('pageLayout');
         const music = document.getElementById('bgMusic');
         let isOpen = false;
 
-        // Force play on first click anywhere
+        // Force play on first click
         document.body.addEventListener('click', () => {
             music.currentTime = 35;
-            if (music.paused) music.play().catch(e => console.log('Autoplay restriction:', e));
+            if (music.paused) music.play().catch(() => { });
         }, { once: true });
+
+        /* ── Photobooth particles ──
+           side_decor.jpg has 2 cols × 4 rows of photos.
+           We show only the top 3 rows (avoid PHOTO TIME text area).
+           Total 6 unique photos. We'll create 12 particles (repeat twice).
+        */
+        const PHOTOS = [
+            { col: 0, row: 0 }, { col: 1, row: 0 },
+            { col: 0, row: 1 }, { col: 1, row: 1 },
+            { col: 0, row: 2 }, { col: 1, row: 2 },
+        ];
+
+        function burstParticles() {
+            const envRect = env.getBoundingClientRect();
+            const cx = envRect.left + envRect.width / 2;
+            const cy = envRect.top + envRect.height / 2;
+
+            // Create 12 particles (each photo × 2)
+            const all = [...PHOTOS, ...PHOTOS];
+
+            all.forEach((photo, i) => {
+                const size = 56 + Math.random() * 30; // 56–86px
+                const angle = (i / all.length) * 2 * Math.PI + (Math.random() - 0.5) * 0.5;
+                const dist = 120 + Math.random() * (Math.min(window.innerWidth, window.innerHeight) * 0.28);
+                const delay = i * 50 + Math.random() * 80; // ms
+
+                // background-position: col 0→0%, col 1→100% | row 0→0%, row 1→33.3%, row 2→66.6%
+                const bpx = photo.col === 0 ? '0%' : '100%';
+                const bpy = ['0%', '33.3%', '66.6%'][photo.row];
+
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.cssText = `
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${cx - size / 2}px;
+                    top:  ${cy - size / 2}px;
+                    background-position: ${bpx} ${bpy};
+                `;
+                document.body.appendChild(p);
+
+                // Animate
+                setTimeout(() => {
+                    p.style.transition = 'none';
+                    p.style.opacity = '1';
+                    p.style.transform = 'scale(0.3)';
+
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            const tx = Math.cos(angle) * dist;
+                            const ty = Math.sin(angle) * dist;
+                            p.style.transition = `transform 1.1s cubic-bezier(0.2,0,0.4,1), opacity 0.4s 0.7s ease`;
+                            p.style.transform = `translate(${tx}px, ${ty}px) scale(1) rotate(${(Math.random() - 0.5) * 30}deg)`;
+                            p.style.opacity = '0';
+                        });
+                    });
+
+                    setTimeout(() => p.remove(), 1400);
+                }, delay);
+            });
+        }
+
+        function closeParticles() {
+            document.querySelectorAll('.particle').forEach(p => p.remove());
+        }
 
         function toggleEnvelope() {
             if (!isOpen) {
                 music.currentTime = 35;
-                music.play().catch(e => { });
+                music.play().catch(() => { });
                 env.classList.remove('float');
                 env.classList.add('open');
-                layout.classList.add('open');
                 btn.innerHTML = 'Đóng Phong Bì 🥺';
                 isOpen = true;
+                setTimeout(burstParticles, 400); // burst after flap opens
             } else {
                 env.classList.remove('open');
                 env.classList.add('float');
-                layout.classList.remove('open');
                 btn.innerHTML = 'Mở Thư Ngay 🌸';
                 isOpen = false;
+                closeParticles();
             }
         }
 

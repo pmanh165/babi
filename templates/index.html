@@ -335,6 +335,52 @@
             document.querySelectorAll('.particle').forEach(p => p.remove());
         }
 
+        /* ── Rain effect ── */
+        let rainInterval = null;
+
+        function spawnRainDrop() {
+            const photo = PHOTOS[Math.floor(Math.random() * PHOTOS.length)];
+            const size = 40 + Math.random() * 28; // 40–68px
+            const x = Math.random() * (window.innerWidth - size);
+            const fallH = window.innerHeight + size + 20;
+            const dur = 2200 + Math.random() * 1800; // 2.2–4s fall
+            const bpx = photo.col === 0 ? '0%' : '100%';
+            const bpy = ['0%', '33.3%', '66.6%'][photo.row];
+            const tilt = (Math.random() - 0.5) * 20; // slight rotate
+
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.cssText = `
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}px;
+                top: -${size}px;
+                background-position: ${bpx} ${bpy};
+                opacity: 0.92;
+                border-width: 2px;
+                transition: transform ${dur}ms linear, opacity 0.3s ${dur - 300}ms ease;
+                transform: translateY(0) rotate(${tilt}deg);
+            `;
+            document.body.appendChild(p);
+
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                p.style.transform = `translateY(${fallH}px) rotate(${tilt + (Math.random() - 0.5) * 40}deg)`;
+                p.style.opacity = '0';
+            }));
+
+            setTimeout(() => p.remove(), dur + 400);
+        }
+
+        function startRain() {
+            if (rainInterval) return;
+            rainInterval = setInterval(spawnRainDrop, 260); // ~4 drops/sec
+        }
+
+        function stopRain() {
+            clearInterval(rainInterval);
+            rainInterval = null;
+        }
+
         function toggleEnvelope() {
             if (!isOpen) {
                 music.currentTime = 35;
@@ -343,12 +389,14 @@
                 env.classList.add('open');
                 btn.innerHTML = 'Đóng Phong Bì 🥺';
                 isOpen = true;
-                setTimeout(burstParticles, 400); // burst after flap opens
+                setTimeout(burstParticles, 400);
+                setTimeout(startRain, 600);
             } else {
                 env.classList.remove('open');
                 env.classList.add('float');
                 btn.innerHTML = 'Mở Thư Ngay 🌸';
                 isOpen = false;
+                stopRain();
                 closeParticles();
             }
         }

@@ -119,6 +119,7 @@
             display: block;
             border-radius: 6px;
             pointer-events: none;
+            -webkit-user-select: none;
             user-select: none;
         }
 
@@ -171,6 +172,7 @@
             width: 30px;
             height: 30px;
             background: rgba(255, 255, 255, .75);
+            -webkit-backdrop-filter: blur(4px);
             backdrop-filter: blur(4px);
             border: none;
             border-radius: 50%;
@@ -349,8 +351,8 @@
 
                 <!-- Photo slides (Jinja) -->
                 {% for src in slides %}
-                <div class="slide">
-                    <img src="/static/{{ src }}" alt="Memory {{ loop.index }}" draggable="false">
+                <div class="slide" data-src="/static/{{ src }}">
+                    <img data-src="/static/{{ src }}" alt="Memory {{ loop.index }}" draggable="false">
                     <span class="slide-counter">{{ loop.index }} / {{ slides|length + 1 }}</span>
                 </div>
                 {% endfor %}
@@ -405,13 +407,24 @@
             dotsEl.appendChild(d);
         }
 
+        /* ── Lazy loader: only load images within ±2 of current slide ── */
+        function loadNearby(n) {
+            const slides = Array.from(track.children);
+            for (let i = Math.max(0, n - 2); i <= Math.min(slides.length - 1, n + 2); i++) {
+                const img = slides[i].querySelector('img[data-src]');
+                if (img) {
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                }
+            }
+        }
+
         function goTo(n) {
             current = Math.max(0, Math.min(n, totalSlides - 1));
             track.style.transform = `translateX(-${current * 100}%)`;
-            // Update dots
+            loadNearby(current);
             dotsEl.querySelectorAll('.dot').forEach((d, i) =>
                 d.classList.toggle('active', i === current));
-            // Update nav buttons
             navPrev.classList.toggle('hidden', current === 0);
             navNext.classList.toggle('hidden', current === totalSlides - 1);
         }

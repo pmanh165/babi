@@ -7,8 +7,8 @@ __pycache__/
 
 # User generated files
 static/images/*
-static/music.mp3
 !static/images/.gitkeep
+!static/*.mp3
 
 # Env overrides
 .env

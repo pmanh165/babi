@@ -42,18 +42,19 @@
 
         /* ── Photobooth panels ── */
         .photobooth {
-            width: 130px;
+            width: 140px;
             background: #fff;
             border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(201, 24, 74, 0.18);
-            padding: 6px 6px 20px;
+            box-shadow: 0 8px 30px rgba(201, 24, 74, 0.2);
+            padding: 8px 8px 18px;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 0;
             opacity: 0;
             transform: scale(0.85) translateY(20px);
             transition: opacity 0.5s 0.7s ease, transform 0.5s 0.7s ease;
             pointer-events: none;
+            overflow: hidden;
         }
 
         .page-layout.open .photobooth {
@@ -62,20 +63,30 @@
             pointer-events: auto;
         }
 
-        .photobooth .strip-img {
+        /* The actual image, shown as bg to allow half-crop */
+        .strip-half {
             width: 100%;
-            aspect-ratio: 3/2;
-            object-fit: cover;
-            border-radius: 6px;
-            background: #f9a8c9;
+            aspect-ratio: 0.48 / 1;
+            background-image: url('/static/images/side_decor.jpg');
+            background-size: 200% 100%;
+            background-repeat: no-repeat;
+            border-radius: 4px;
         }
 
-        .photobooth .strip-label {
+        .strip-half-left {
+            background-position: 0% top;
+        }
+
+        .strip-half-right {
+            background-position: 100% top;
+        }
+
+        .strip-label {
             text-align: center;
             font-size: 11px;
             color: #c9184a;
             font-family: 'Dancing Script', cursive;
-            margin-top: 4px;
+            margin-top: 8px;
             font-weight: 600;
         }
 
@@ -280,14 +291,9 @@
     <!-- ── Page Layout: photobooth | envelope | photobooth ── -->
     <div class="page-layout" id="pageLayout">
 
-        <!-- Left photobooth -->
+        <!-- Left photobooth: left half of side_decor.jpg -->
         <div class="photobooth" id="photoLeft">
-            <img src="/static/images/photo1.jpg" alt="Photo 1" class="strip-img"
-                onerror="this.style.background='#f9a8c9'">
-            <img src="/static/images/photo1.jpg" alt="Photo 2" class="strip-img"
-                onerror="this.style.background='#ffc2d1'">
-            <img src="/static/images/photo1.jpg" alt="Photo 3" class="strip-img"
-                onerror="this.style.background='#ffb3c6'">
+            <div class="strip-half strip-half-left"></div>
             <div class="strip-label">🌸 Our Moments 🌸</div>
         </div>
 
@@ -318,14 +324,9 @@
             <button class="action-btn" id="toggleBtn">Mở Thư Ngay 🌸</button>
         </div>
 
-        <!-- Right photobooth -->
+        <!-- Right photobooth: right half of side_decor.jpg -->
         <div class="photobooth" id="photoRight">
-            <img src="/static/images/photo2.jpg" alt="Photo 4" class="strip-img"
-                onerror="this.style.background='#ffa8c9'">
-            <img src="/static/images/photo2.jpg" alt="Photo 5" class="strip-img"
-                onerror="this.style.background='#ffd6e0'">
-            <img src="/static/images/photo2.jpg" alt="Photo 6" class="strip-img"
-                onerror="this.style.background='#ffb3c6'">
+            <div class="strip-half strip-half-right"></div>
             <div class="strip-label">💕 Always Us 💕</div>
         </div>
     </div>

@@ -55,16 +55,18 @@ try:
         user_agent = request.headers.get('user-agent', 'Unknown')
         background_tasks.add_task(trigger_webhook, user_agent)
 
-        # Auto-discover all photos in static/images/Library/, sorted naturally
+        # Auto-discover all media in static/images/Library/, sorted naturally
         img_dir = os.path.join(BASE_DIR, "static", "images", "Library")
         slides = []
         if os.path.isdir(img_dir):
-            exts = (".jpg", ".jpeg", ".png", ".webp", ".gif")
-            files = sorted([
-                f for f in os.listdir(img_dir)
-                if f.lower().endswith(exts)
-            ])
-            slides = [f"images/Library/{f}" for f in files]
+            IMG_EXT = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
+            VID_EXT = {".mp4", ".mov", ".webm"}
+            for f in sorted(os.listdir(img_dir)):
+                ext = os.path.splitext(f)[1].lower()
+                if ext in IMG_EXT:
+                    slides.append({"src": f"images/Library/{f}", "kind": "image"})
+                elif ext in VID_EXT:
+                    slides.append({"src": f"images/Library/{f}", "kind": "video"})
 
         return templates.TemplateResponse("index.html", {
             "request": request,

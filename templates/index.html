@@ -349,10 +349,15 @@
         <div class="card" id="card">
             <div class="slide-track" id="slideTrack">
 
-                <!-- Photo slides (Jinja) -->
-                {% for src in slides %}
-                <div class="slide" data-src="/static/{{ src }}">
-                    <img data-src="/static/{{ src }}" alt="Memory {{ loop.index }}" draggable="false">
+                <!-- Photo & Video slides (Jinja) -->
+                {% for slide in slides %}
+                <div class="slide" data-kind="{{ slide.kind }}">
+                    {% if slide.kind == 'video' %}
+                    <video data-src="/static/{{ slide.src }}" autoplay muted playsinline loop
+                        style="width:100%;height:100%;object-fit:cover;border-radius:6px;"></video>
+                    {% else %}
+                    <img data-src="/static/{{ slide.src }}" alt="Memory {{ loop.index }}" draggable="false">
+                    {% endif %}
                     <span class="slide-counter">{{ loop.index }} / {{ slides|length + 1 }}</span>
                 </div>
                 {% endfor %}
@@ -407,22 +412,30 @@
             dotsEl.appendChild(d);
         }
 
-        /* ── Lazy loader: only load images within ±2 of current slide ── */
+        /* ── Lazy loader: only load media within ±2 of current slide ── */
         function loadNearby(n) {
-            const slides = Array.from(track.children);
-            for (let i = Math.max(0, n - 2); i <= Math.min(slides.length - 1, n + 2); i++) {
-                const img = slides[i].querySelector('img[data-src]');
-                if (img) {
-                    img.src = img.dataset.src;
-                    img.removeAttribute('data-src');
-                }
+            const slideEls = Array.from(track.children);
+            for (let i = Math.max(0, n - 2); i <= Math.min(slideEls.length - 1, n + 2); i++) {
+                const img = slideEls[i].querySelector('img[data-src]');
+                if (img) { img.src = img.dataset.src; img.removeAttribute('data-src'); }
+                const vid = slideEls[i].querySelector('video[data-src]');
+                if (vid) { vid.src = vid.dataset.src; vid.removeAttribute('data-src'); vid.load(); }
             }
         }
 
         function goTo(n) {
+            // Pause outgoing video
+            const leaving = track.children[current];
+            if (leaving) { const v = leaving.querySelector('video'); if (v) v.pause(); }
+
             current = Math.max(0, Math.min(n, totalSlides - 1));
             track.style.transform = `translateX(-${current * 100}%)`;
             loadNearby(current);
+
+            // Play incoming video
+            const entering = track.children[current];
+            if (entering) { const v = entering.querySelector('video'); if (v) v.play().catch(() => { }); }
+
             dotsEl.querySelectorAll('.dot').forEach((d, i) =>
                 d.classList.toggle('active', i === current));
             navPrev.classList.toggle('hidden', current === 0);

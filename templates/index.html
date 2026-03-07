@@ -24,7 +24,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: url("/static/images/background.jpg") center/cover no-repeat fixed,
+            background: url("/static/images/background.jpg") center/cover no-repeat,
                 linear-gradient(135deg, var(--bg-pink) 0%, #ffc2d1 100%);
             color: var(--text-color);
             font-family: 'Inter', sans-serif;
@@ -61,6 +61,29 @@
             opacity: 1;
             transform: scale(1) translateY(0);
             pointer-events: auto;
+            animation: photoFloat 5s ease-in-out infinite;
+        }
+
+        #photoLeft {
+            animation-delay: 0s;
+        }
+
+        #photoRight {
+            animation-delay: 2.5s;
+        }
+
+        @keyframes photoFloat {
+            0% {
+                transform: scale(1) translateY(0px) rotate(0.5deg);
+            }
+
+            50% {
+                transform: scale(1) translateY(-10px) rotate(-0.5deg);
+            }
+
+            100% {
+                transform: scale(1) translateY(0px) rotate(0.5deg);
+            }
         }
 
         /* The actual image, shown as bg to allow half-crop */

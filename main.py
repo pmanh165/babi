@@ -7,8 +7,7 @@ import requests
 import os
 import glob
 
-# Auto-create static directories to prevent Render failures
-os.makedirs("static/images", exist_ok=True)
+# Vercel functions are read-only, so we cannot create directories here at runtime.
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")

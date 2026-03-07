@@ -303,8 +303,43 @@
         }
 
         @media (max-width: 768px) {
+
+            /* Stack everything vertically on mobile */
+            .page-layout {
+                flex-direction: column;
+                gap: 12px;
+                padding: 20px 0;
+            }
+
+            /* Wrap both photobooths in a row below the envelope */
+            #photoLeft,
+            #photoRight {
+                order: 2;
+                /* push below center-col */
+                width: 38vw;
+                max-width: 160px;
+                min-width: 110px;
+            }
+
+            .center-col {
+                order: 1;
+            }
+
+            /* Lay the two panels in a row by making page-layout a row again
+               but wrapping the photo panels into a flex row */
+            .page-layout {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .center-col {
+                width: 100%;
+                order: 1;
+            }
+
             .photobooth {
-                display: none;
+                order: 2;
             }
 
             .envelope-wrapper {

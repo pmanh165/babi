@@ -13,15 +13,18 @@
             --text-color: #590d22;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             padding: 0;
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: url("/static/images/background.jpg") center/cover no-repeat,
+            background: url("/static/images/background.jpg") center/cover no-repeat fixed,
                 linear-gradient(135deg, var(--bg-pink) 0%, #ffc2d1 100%);
             color: var(--text-color);
             font-family: 'Inter', sans-serif;
@@ -29,35 +32,67 @@
             perspective: 1000px;
         }
 
-        /* Decorative Side Images */
-        .decor {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            height: 90vh;
-            max-width: 280px;
-            object-fit: contain;
+        /* ── Page layout ── */
+        .page-layout {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ── Photobooth panels ── */
+        .photobooth {
+            width: 130px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(201, 24, 74, 0.18);
+            padding: 6px 6px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            opacity: 0;
+            transform: scale(0.85) translateY(20px);
+            transition: opacity 0.5s 0.7s ease, transform 0.5s 0.7s ease;
             pointer-events: none;
-            z-index: 0;
-            opacity: 0.85;
         }
 
-        .decor-left {
-            left: 2%;
+        .page-layout.open .photobooth {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
         }
 
-        .decor-right {
-            right: 2%;
-            transform: translateY(-50%) scaleX(-1);
+        .photobooth .strip-img {
+            width: 100%;
+            aspect-ratio: 3/2;
+            object-fit: cover;
+            border-radius: 6px;
+            background: #f9a8c9;
         }
 
+        .photobooth .strip-label {
+            text-align: center;
+            font-size: 11px;
+            color: #c9184a;
+            font-family: 'Dancing Script', cursive;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        /* ── Centre column ── */
+        .center-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ── Envelope ── */
         .envelope-wrapper {
             position: relative;
             width: 340px;
             height: 220px;
             z-index: 10;
-            margin-top: 10vh;
-            /* Push envelope down on short screens */
+            flex-shrink: 0;
         }
 
         .envelope-wrapper.float {
@@ -102,12 +137,9 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             padding: 24px;
-            box-sizing: border-box;
             text-align: center;
             overflow-y: auto;
             scrollbar-width: none;
-
-            /* Z-index & transform */
             z-index: 2;
             transform: translateY(0);
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
@@ -119,9 +151,8 @@
 
         .envelope-wrapper.open .letter {
             transform: translateY(-20px);
-            transition: transform 0.6s 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.6s 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             height: 260px;
-            /* Reduced to avoid top cropping */
+            transition: transform 0.6s 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.6s 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .flap {
@@ -161,8 +192,6 @@
             clip-path: polygon(0 0, 50% 55%, 100% 0);
             transform-origin: top;
             border-radius: 8px 8px 0 0;
-
-            /* Magic Z-index flipping */
             z-index: 6;
             transition: transform 0.5s 0.6s, z-index 0s 0.6s;
         }
@@ -199,10 +228,9 @@
             transition: opacity 0.2s 0s;
         }
 
+        /* ── Action button ── */
         .action-btn {
-            margin-top: 30px;
-            /* Reduced from 80px */
-            margin-bottom: 5vh;
+            margin-top: 28px;
             background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%);
             border: none;
             padding: 14px 40px;
@@ -214,6 +242,7 @@
             box-shadow: 0 10px 20px rgba(201, 24, 74, 0.3);
             transition: all 0.2s;
             z-index: 20;
+            white-space: nowrap;
         }
 
         .action-btn:hover {
@@ -236,9 +265,8 @@
         }
 
         @media (max-width: 768px) {
-            .decor {
-                opacity: 0.3;
-                height: 50vh;
+            .photobooth {
+                display: none;
             }
 
             .envelope-wrapper {
@@ -249,32 +277,58 @@
 </head>
 
 <body>
-    <img src="/static/images/side_decor.jpg" alt="decor" class="decor decor-left" onerror="this.style.display='none'">
-    <img src="/static/images/side_decor.jpg" alt="decor" class="decor decor-right" onerror="this.style.display='none'">
+    <!-- ── Page Layout: photobooth | envelope | photobooth ── -->
+    <div class="page-layout" id="pageLayout">
 
-    <div class="envelope-wrapper float" id="envContainer">
-        <div class="env-back"></div>
-
-        <!-- The Sliding Letter -->
-        <div class="letter">
-            <h1>For You ✨</h1>
-            {% if images %}
-            <img src="/static/{{ images[0] }}" alt="Gift"
-                style="width:100%; border-radius:8px; margin-bottom:15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"
-                onerror="this.style.display='none'">
-            {% endif %}
-            <p>{{ message }}</p>
+        <!-- Left photobooth -->
+        <div class="photobooth" id="photoLeft">
+            <img src="/static/images/photo1.jpg" alt="Photo 1" class="strip-img"
+                onerror="this.style.background='#f9a8c9'">
+            <img src="/static/images/photo1.jpg" alt="Photo 2" class="strip-img"
+                onerror="this.style.background='#ffc2d1'">
+            <img src="/static/images/photo1.jpg" alt="Photo 3" class="strip-img"
+                onerror="this.style.background='#ffb3c6'">
+            <div class="strip-label">🌸 Our Moments 🌸</div>
         </div>
 
-        <div class="flap flap-left"></div>
-        <div class="flap flap-right"></div>
-        <div class="flap flap-bottom"></div>
-        <div class="flap flap-top"></div>
+        <!-- Centre: envelope + button stacked -->
+        <div class="center-col">
+            <div class="envelope-wrapper float" id="envContainer">
+                <div class="env-back"></div>
 
-        <div class="seal" id="sealBtn">💌</div>
+                <!-- The Sliding Letter -->
+                <div class="letter">
+                    <h1>For You ✨</h1>
+                    {% if images %}
+                    <img src="/static/{{ images[0] }}" alt="Gift"
+                        style="width:100%; border-radius:8px; margin-bottom:15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"
+                        onerror="this.style.display='none'">
+                    {% endif %}
+                    <p>{{ message }}</p>
+                </div>
+
+                <div class="flap flap-left"></div>
+                <div class="flap flap-right"></div>
+                <div class="flap flap-bottom"></div>
+                <div class="flap flap-top"></div>
+
+                <div class="seal" id="sealBtn">💌</div>
+            </div>
+
+            <button class="action-btn" id="toggleBtn">Mở Thư Ngay 🌸</button>
+        </div>
+
+        <!-- Right photobooth -->
+        <div class="photobooth" id="photoRight">
+            <img src="/static/images/photo2.jpg" alt="Photo 4" class="strip-img"
+                onerror="this.style.background='#ffa8c9'">
+            <img src="/static/images/photo2.jpg" alt="Photo 5" class="strip-img"
+                onerror="this.style.background='#ffd6e0'">
+            <img src="/static/images/photo2.jpg" alt="Photo 6" class="strip-img"
+                onerror="this.style.background='#ffb3c6'">
+            <div class="strip-label">💕 Always Us 💕</div>
+        </div>
     </div>
-
-    <button class="action-btn" id="toggleBtn">Mở Thư Ngay 🌸</button>
 
     <audio id="bgMusic" loop autoplay>
         <source src="/music.mp3" type="audio/mpeg">
@@ -284,10 +338,11 @@
         const btn = document.getElementById('toggleBtn');
         const sealBtn = document.getElementById('sealBtn');
         const env = document.getElementById('envContainer');
+        const layout = document.getElementById('pageLayout');
         const music = document.getElementById('bgMusic');
         let isOpen = false;
 
-        // Force play on first click anywhere (bypasses browser autoplay restrictions)
+        // Force play on first click anywhere
         document.body.addEventListener('click', () => {
             if (music.paused) music.play().catch(e => console.log('Autoplay restriction:', e));
         }, { once: true });
@@ -297,12 +352,14 @@
                 music.play().catch(e => { });
                 env.classList.remove('float');
                 env.classList.add('open');
+                layout.classList.add('open');
                 btn.innerHTML = 'Đóng Phong Bì 🥺';
                 isOpen = true;
             } else {
                 env.classList.remove('open');
                 env.classList.add('float');
-                btn.innerHTML = 'Tiếp Tục Đọc 🌸';
+                layout.classList.remove('open');
+                btn.innerHTML = 'Mở Thư Ngay 🌸';
                 isOpen = false;
             }
         }

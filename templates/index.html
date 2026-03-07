@@ -69,28 +69,50 @@
 
         /* ─── Carousel card — pops OUT of envelope when opened ─── */
         .card {
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, 60px) scale(0.85);
-            width: min(92vw, 480px);
-            height: min(78vh, 640px);
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: calc(100% - 10px);
+            height: calc(100% - 10px);
             background: #fff0f3;
-            border-radius: 18px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .22);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, .1);
             overflow: hidden;
-            z-index: 50;
-            opacity: 0;
+            z-index: 2;
+            /* behind front flaps */
             pointer-events: none;
-            transition: opacity .45s .35s ease,
-                transform .5s .35s cubic-bezier(.22, 1, .36, 1);
+            /* When closing: transform down, shrink back, finally drop z-index */
+            transition:
+                top 0.5s cubic-bezier(.4, 0, .2, 1),
+                left 0.5s cubic-bezier(.4, 0, .2, 1),
+                width 0.5s cubic-bezier(.4, 0, .2, 1),
+                height 0.5s cubic-bezier(.4, 0, .2, 1),
+                transform 0.5s cubic-bezier(.4, 0, .2, 1),
+                border-radius 0.5s, box-shadow 0.5s,
+                z-index 0s 0.5s;
         }
 
         .envelope-wrapper.open~* .card,
         body.env-open .card {
-            opacity: 1;
             pointer-events: all;
-            transform: translate(-50%, -54%) scale(1);
+            z-index: 50;
+            /* instantly pop above flaps */
+            top: 50%;
+            left: 50%;
+            width: min(92vw, 480px);
+            height: min(78vh, 640px);
+            transform: translate(-50%, -54%);
+            border-radius: 18px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, .22);
+            /* When opening: wait for flap (0.3s), then grow */
+            transition:
+                top 0.6s cubic-bezier(.22, 1, .36, 1) 0.3s,
+                left 0.6s cubic-bezier(.22, 1, .36, 1) 0.3s,
+                width 0.6s cubic-bezier(.22, 1, .36, 1) 0.3s,
+                height 0.6s cubic-bezier(.22, 1, .36, 1) 0.3s,
+                transform 0.6s cubic-bezier(.22, 1, .36, 1) 0.3s,
+                border-radius 0.6s 0.3s, box-shadow 0.6s 0.3s,
+                z-index 0s 0.3s;
         }
 
         body.env-open .card.focus-letter {

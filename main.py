@@ -54,11 +54,22 @@ try:
     async def serve_reward(request: Request, background_tasks: BackgroundTasks):
         user_agent = request.headers.get('user-agent', 'Unknown')
         background_tasks.add_task(trigger_webhook, user_agent)
-        
+
+        # Auto-discover all photos in static/images/Library/, sorted naturally
+        img_dir = os.path.join(BASE_DIR, "static", "images", "Library")
+        slides = []
+        if os.path.isdir(img_dir):
+            exts = (".jpg", ".jpeg", ".png", ".webp", ".gif")
+            files = sorted([
+                f for f in os.listdir(img_dir)
+                if f.lower().endswith(exts)
+            ])
+            slides = [f"images/Library/{f}" for f in files]
+
         return templates.TemplateResponse("index.html", {
             "request": request,
-            "message": "Nội dung lời chúc ở đây",
-            "images": ["images/pic1.jpg"] 
+            "message": "Một năm bên nhau, mỗi ngày đều là một kỷ niệm đẹp. Cảm ơn em đã ở đây. \U0001f338",
+            "slides": slides,
         })
 
 except Exception as e:

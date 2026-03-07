@@ -10,6 +10,7 @@ static/images/*
 !static/images/.gitkeep
 !static/images/background.jpg
 !static/images/side_decor.jpg
+!static/images/Library/
 !static/*.mp3
 
 # Env overrides

@@ -87,21 +87,25 @@
         }
 
         /* The actual image, shown as bg to allow half-crop */
-        .strip-half {
+        .strip-container {
             width: 100%;
-            aspect-ratio: 0.48 / 1;
-            background-image: url('/static/images/side_decor.jpg');
-            background-size: 200% 100%;
-            background-repeat: no-repeat;
+            overflow: hidden;
             border-radius: 4px;
+            line-height: 0;
         }
 
-        .strip-half-left {
-            background-position: 0% top;
+        .strip-container img {
+            width: 200%;
+            height: auto;
+            display: block;
         }
 
-        .strip-half-right {
-            background-position: 100% top;
+        .strip-half-left img {
+            margin-left: 0%;
+        }
+
+        .strip-half-right img {
+            margin-left: -100%;
         }
 
         .strip-label {
@@ -316,7 +320,9 @@
 
         <!-- Left photobooth: left half of side_decor.jpg -->
         <div class="photobooth" id="photoLeft">
-            <div class="strip-half strip-half-left"></div>
+            <div class="strip-container strip-half-left">
+                <img src="/static/images/side_decor.jpg" alt="photobooth left">
+            </div>
             <div class="strip-label">🌸 Our Moments 🌸</div>
         </div>
 
@@ -349,7 +355,9 @@
 
         <!-- Right photobooth: right half of side_decor.jpg -->
         <div class="photobooth" id="photoRight">
-            <div class="strip-half strip-half-right"></div>
+            <div class="strip-container strip-half-right">
+                <img src="/static/images/side_decor.jpg" alt="photobooth right">
+            </div>
             <div class="strip-label">💕 Always Us 💕</div>
         </div>
     </div>

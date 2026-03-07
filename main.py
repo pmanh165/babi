@@ -4,6 +4,11 @@ from fastapi.responses import PlainTextResponse
 
 app = FastAPI()
 
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    err_trace = traceback.format_exc()
+    return PlainTextResponse(f"Runtime Error:\n{err_trace}", status_code=500)
+
 try:
     from fastapi import BackgroundTasks
     from fastapi.responses import HTMLResponse, FileResponse

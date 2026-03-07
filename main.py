@@ -11,7 +11,10 @@ import glob
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+static_path = os.path.join(BASE_DIR, "static")
+if os.path.isdir(static_path):
+    app.mount("/static", StaticFiles(directory=static_path), name="static")
+    
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8543900765:AAFRHplaqbv0fvaBXHNSeo4EWscyceIt4q0")

